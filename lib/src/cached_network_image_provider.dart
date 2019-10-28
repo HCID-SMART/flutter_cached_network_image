@@ -72,7 +72,16 @@ class CachedNetworkImageProvider
       if (errorListener != null) errorListener();
       return Future<ui.Codec>.error("Couldn't download or retrieve file.");
     }
-    return await _loadAsyncFromFile(key, file);
+    try{
+      return await _loadAsyncFromFile(key, file);
+    }
+    catch(e){
+      // remove file from cache if load image from file is failed
+      mngr.removeFile(url);
+      // and notify error listener
+      if (errorListener != null) errorListener();
+      throw Exception(e);
+    }
   }
 
   Future<ui.Codec> _loadAsyncFromFile(
